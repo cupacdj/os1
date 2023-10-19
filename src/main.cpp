@@ -1,5 +1,12 @@
 #include "../lib/console.h"
 
+
+void interrupt_handler()
+{
+
+}
+
+
 int main()
 {
     int a = 0;
