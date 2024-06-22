@@ -1,20 +1,34 @@
-#include "../lib/console.h"
+//
+// Created by marko on 20.4.22..
+//
 
-extern "C" void trap();
-
-void interrupt_handler()
-{
-
-}
-
+#include "../h/ccb.hpp"
+#include "../h/workers.hpp"
+#include "../h/print.hpp"
 
 int main()
 {
-    asm volatile("csrw stvec, %0" ::"r"(trap));
+    CCB *coroutines[3];
 
-    int a = 0;
-    a++;
-    __putc('v');
-    __putc('\n');
-    return a;
+    coroutines[0] = CCB::createCoroutine(nullptr);
+    CCB::running = coroutines[0];
+
+    coroutines[1] = CCB::createCoroutine(workerBodyA);
+    printString("CoroutineA created\n");
+    coroutines[2] = CCB::createCoroutine(workerBodyB);
+    printString("CoroutineB created\n");
+
+    while (!(coroutines[1]->isFinished() &&
+             coroutines[2]->isFinished()))
+    {
+        CCB::yield();
+    }
+
+    for (auto &coroutine: coroutines)
+    {
+        delete coroutine;
+    }
+    printString("Finished\n");
+
+    return 0;
 }
