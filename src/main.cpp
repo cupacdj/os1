@@ -2,37 +2,47 @@
 // Created by marko on 20.4.22..
 //
 
-#include "../h/ccb.hpp"
+#include "../h/tcb.hpp"
 #include "../h/workers.hpp"
 #include "../h/print.hpp"
-
-#include "../h/MemoryAllocator.hpp"
 #include "../h/riscv.hpp"
 
-extern "C" void trap();
+#include "../h/MemoryAllocator.hpp"
+
+#include "../h/syscall_c.hpp"
+
 int main()
 {
     MemoryAllocator::init();
+    Riscv::w_stvec((uint64) &Riscv::supervisorTrap);
 
-    CCB *coroutines[3];
+    mem_alloc(500);
 
-    coroutines[0] = CCB::createCoroutine(nullptr);
-    CCB::running = coroutines[0];
+    TCB *threads[5];
 
-    coroutines[1] = CCB::createCoroutine(workerBodyA);
-    printString("CoroutineA created\n");
-    coroutines[2] = CCB::createCoroutine(workerBodyB);
-    printString("CoroutineB created\n");
+    threads[0] = TCB::createThread(nullptr);
+    TCB::running = threads[0];
 
-    while (!(coroutines[1]->isFinished() &&
-             coroutines[2]->isFinished()))
+    threads[1] = TCB::createThread(workerBodyA);
+    printString("ThreadA created\n");
+    threads[2] = TCB::createThread(workerBodyB);
+    printString("ThreadB created\n");
+    threads[3] = TCB::createThread(workerBodyC);
+    printString("ThreadC created\n");
+    threads[4] = TCB::createThread(workerBodyD);
+    printString("ThreadD created\n");
+
+    while (!(threads[1]->isFinished() &&
+             threads[2]->isFinished() &&
+             threads[3]->isFinished() &&
+             threads[4]->isFinished()))
     {
-        CCB::yield();
+        thread_dispatch();
     }
 
-    for (auto &coroutine: coroutines)
+    for (auto &thread: threads)
     {
-        delete coroutine;
+        delete thread;
     }
     printString("Finished\n");
 

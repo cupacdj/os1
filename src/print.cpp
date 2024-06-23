@@ -3,6 +3,7 @@
 //
 
 #include "../h/print.hpp"
+#include "../h/riscv.hpp"
 #include "../lib/console.h"
 
 void printString(char const *string)
@@ -14,9 +15,9 @@ void printString(char const *string)
     }
 }
 
-void printInteger(uint64 integer)
+void printInteger(uint64 integer, int base)
 {
-    static char digits[] = "0123456789";
+    static char digits[] = "0123456789ABCDEF";
     char buf[16];
     int i, neg;
     uint x;
@@ -34,11 +35,10 @@ void printInteger(uint64 integer)
     i = 0;
     do
     {
-        buf[i++] = digits[x % 10];
-    } while ((x /= 10) != 0);
+        buf[i++] = digits[x % base];
+    } while ((x /= base) != 0);
     if (neg)
         buf[i++] = '-';
 
-    while (--i >= 0)
-        __putc(buf[i]);
+    while (--i >= 0) { __putc(buf[i]); }
 }
