@@ -8,15 +8,11 @@ class MemoryAllocator {
 
 public:
 
-    MemoryAllocator(const MemoryAllocator&) = delete;
-    MemoryAllocator& operator=(const MemoryAllocator&) = delete;
-
-    static MemoryAllocator* getInstance();
+    static void init();
 
     static void* mem_alloc(size_t size);
 
     static int mem_free(void* ptr);
-
     
     struct Block
     {
@@ -25,11 +21,11 @@ public:
         size_t size;
     };
 
+    static int tryToMerge(Block* block);
+
 private:
     
     static Block* head;
-    static MemoryAllocator* instance;
-    MemoryAllocator(){};
 
 
 };

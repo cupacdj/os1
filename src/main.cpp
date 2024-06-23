@@ -6,8 +6,14 @@
 #include "../h/workers.hpp"
 #include "../h/print.hpp"
 
+#include "../h/MemoryAllocator.hpp"
+#include "../h/riscv.hpp"
+
+extern "C" void trap();
 int main()
 {
+    MemoryAllocator::init();
+
     CCB *coroutines[3];
 
     coroutines[0] = CCB::createCoroutine(nullptr);
