@@ -1,7 +1,3 @@
-//
-// Created by marko on 20.4.22..
-//
-
 #include "../h/MemoryAllocator.hpp"
 
 using size_t = decltype(sizeof(0));

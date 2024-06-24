@@ -36,20 +36,20 @@ int sem_close(sem_t handle) {
     return ecall(SEM_CLOSE, handle);
 }
 
-int sem_wait(sem_t id) {
-    return ecall(SEM_WAIT, id);
+int sem_wait(sem_t handle) {
+    return ecall(SEM_WAIT, handle);
 }
 
-int sem_signal(sem_t id) {
-    return ecall(SEM_SIGNAL, id);
+int sem_signal(sem_t handle) {
+    return ecall(SEM_SIGNAL, handle);
 }
 
-int sem_trywait(sem_t id) {
-    return ecall(SEM_TRYWAIT, id);
+int sem_trywait(sem_t handle) {
+    return ecall(SEM_TRYWAIT, handle);
 }
 
-int sem_timedwait(sem_t id, time_t timeout) {
-    return ecall(SEM_TIMEDWAIT, id, timeout);
+int sem_timedwait(sem_t handle, time_t timeout) {
+    return ecall(SEM_TIMEDWAIT, handle, timeout);
 }
 
 int time_sleep(time_t time) {

@@ -1,12 +1,8 @@
-//
-// Created by marko on 20.4.22..
-//
-
 #include "../h/print.hpp"
 #include "../h/riscv.hpp"
 #include "../lib/console.h"
 
-void printString(char const *string)
+void _printString(char const *string)
 {
     while (*string != '\0')
     {
@@ -15,7 +11,7 @@ void printString(char const *string)
     }
 }
 
-void printInteger(uint64 integer, int base)
+void _printInteger(uint64 integer, int base)
 {
     static char digits[] = "0123456789ABCDEF";
     char buf[16];

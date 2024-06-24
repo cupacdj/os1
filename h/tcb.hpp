@@ -1,16 +1,12 @@
-//
-// Created by marko on 20.4.22..
-//
-
-#ifndef OS1_VEZBE07_RISCV_CONTEXT_SWITCH_2_INTERRUPT_TCB_HPP
-#define OS1_VEZBE07_RISCV_CONTEXT_SWITCH_2_INTERRUPT_TCB_HPP
+#ifndef OS1_TCB_HPP
+#define OS1_TCB_HPP
 
 #include "../lib/hw.h"
 #include "scheduler.hpp"
 
 // Thread Control Block
-class TCB
-{
+class TCB {
+
 public:
     ~TCB() { delete[] stack; }
 
@@ -18,40 +14,43 @@ public:
 
     void setFinished(bool value) { finished = value; }
 
-    uint64 getTimeSlice() const { return timeSlice; }
+    bool isBlocked() const { return blocked; }
 
-    using Body = void (*)();
+    void setBlocked(bool value) { blocked = value; }
 
-    static TCB *createThread(Body body);
+    using Body = void (*)(void*);
+
+    static TCB *createThread(Body body, void* arg, char* stack);
 
     static TCB *running;
 
 private:
-    TCB(Body body, uint64 timeSlice) :
+    TCB(Body body, void* arg, char* stack) :
             body(body),
-            stack(body != nullptr ? new uint64[STACK_SIZE] : nullptr),
-            context({(uint64) &threadWrapper,
-                     stack != nullptr ? (uint64) &stack[STACK_SIZE] : 0
+            arg(arg),
+            stack(stack),
+            context({(size_t) &threadWrapper,
+                     stack != nullptr ? (size_t) &stack[DEFAULT_STACK_SIZE] : 0
                     }),
-            timeSlice(timeSlice),
-            finished(false)
-    {
-        if (body != nullptr) { Scheduler::put(this); }
-    }
+            finished(false),
+            blocked(false)
+    {}
 
     struct Context
     {
-        uint64 ra;
-        uint64 sp;
+        size_t ra;
+        size_t sp;
     };
 
+    bool blocked;
     Body body;
-    uint64 *stack;
+    void* arg;
+    char *stack;
     Context context;
-    uint64 timeSlice;
     bool finished;
 
     friend class Riscv;
+    friend class SCB;
 
     static void threadWrapper();
 
@@ -59,10 +58,6 @@ private:
 
     static void dispatch();
 
-    static uint64 timeSliceCounter;
-
-    static uint64 constexpr STACK_SIZE = 1024;
-    static uint64 constexpr TIME_SLICE = 2;
 };
 
-#endif //OS1_VEZBE07_RISCV_CONTEXT_SWITCH_2_INTERRUPT_TCB_HPP
+#endif //OS1_TCB_HPP

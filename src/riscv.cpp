@@ -12,6 +12,10 @@
 
 #include "../h/MemoryAllocator.hpp"
 
+#include "../h/syscall_cpp.hpp"
+
+#include "../h/scb.hpp"
+
 void Riscv::popSppSpie()
 {
     asm volatile("csrc sstatus, %0" : : "r" (SSTATUS_SPP));
@@ -45,17 +49,26 @@ void Riscv::handleSupervisorTrap()
         case MEM_FREE:
         {
             void *ptr = (void *)get_user_register(a1);
-            int ret = MemoryAllocator::mem_free(ptr);
-            set_user_register(a0, ret);
+            int result = MemoryAllocator::mem_free(ptr);
+            set_user_register(a0, result);
             break;
         }
         case THREAD_CREATE:
         {
-            // thread_t *handle = (thread_t *)get_user_register(a1);
-            // void (*start_routine)(void *) = (void (*)(void *))get_user_register(a2);
-            // void *arg = (void *)get_user_register(a3);
-            // void *stack = (void *)get_user_register(a4);
-            // ...
+            thread_t *handle = (thread_t *)get_user_register(a1);
+            void (*start_routine)(void *) = (void (*)(void *))get_user_register(a2);
+            void *arg = (void *)get_user_register(a3);
+            char *stack = (char *)get_user_register(a4);
+            auto thread = TCB::createThread(start_routine, arg, stack);
+            if (thread) { 
+                Scheduler::put(thread); 
+                *handle = thread;
+                set_user_register(a0, 0);
+            }
+            else {
+                *handle = nullptr;
+                set_user_register(a0, -1);
+            }
             break;
         }   
         case THREAD_EXIT:
@@ -70,7 +83,66 @@ void Riscv::handleSupervisorTrap()
             break;
         }
 
+        case SEM_OPEN:
+        {
+            sem_t *handle = (sem_t *)get_user_register(a1);
+            size_t init = get_user_register(a2);
+            auto sem = SCB::createSemaphore(init);
+            if (sem) {
+                *handle = sem;
+                set_user_register(a0, 0);
+            }
+            else {
+                *handle = nullptr;
+                set_user_register(a0, -1);
+            }
+            break;
+        }
+
+        case SEM_CLOSE:
+        {
+            sem_t handle = (sem_t)get_user_register(a1);
+            int ret = handle->closeSemaphore();
+            set_user_register(0, ret);
+            break;
+        }
+
+        case SEM_WAIT:
+        {
+            sem_t handle = (sem_t)get_user_register(a1);
+            int ret = handle->wait();
+            set_user_register(0, ret);
+            break;
+        }
+
+        case SEM_SIGNAL:
+        {
+            sem_t handle = (sem_t)get_user_register(a1);
+            int ret = handle->signal();
+            set_user_register(0, ret);
+            break;
+        }
+
         
+
+        case GETC:
+        {
+            char c = __getc();
+            set_user_register(a0, c);
+            break;
+        }
+        case PUTC:
+        {
+            char c = get_user_register(a1);
+            __putc(c);
+            break;
+        }
+
+        
+
+        
+        case TIME_SLEEP:
+        case SEM_TIMEDWAIT:
         default:
             break;
         }
@@ -103,11 +175,11 @@ void Riscv::handleSupervisorTrap()
     else
     {
         // unexpected trap cause
-        printString("Unexpected trap cause: ");
-        printInteger(scause, 16);
-        printString(", sepc: ");
-        printInteger(sepc, 16);
-        printString("\n");
+        _printString("Unexpected trap cause: ");
+        _printInteger(scause, 16);
+        _printString(", sepc: ");
+        _printInteger(sepc, 16);
+        _printString("\n");
         while (1);
     }
     w_sstatus(sstatus);

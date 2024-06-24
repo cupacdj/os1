@@ -1,9 +1,5 @@
-//
-// Created by marko on 20.4.22..
-//
-
-#ifndef OS1_VEZBE07_RISCV_CONTEXT_SWITCH_2_INTERRUPT_RISCV_HPP
-#define OS1_VEZBE07_RISCV_CONTEXT_SWITCH_2_INTERRUPT_RISCV_HPP
+#ifndef OS1_RISCV_HPP
+#define OS1_RISCV_HPP
 
 #include "../lib/hw.h"
 
@@ -204,4 +200,4 @@ inline void Riscv::set_user_register(size_t index, size_t value)
     __asm__ volatile ("sd %[value], 8*%[index](fp)" : : [value] "r"(value), [index] "i"(index));
 }
 
-#endif //OS1_VEZBE07_RISCV_CONTEXT_SWITCH_2_INTERRUPT_RISCV_HPP
+#endif //OS1_RISCV_HPP

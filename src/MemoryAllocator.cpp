@@ -13,9 +13,6 @@ void MemoryAllocator::init() {
 void* MemoryAllocator::mem_alloc(size_t size) {
     if(size <= 0) return nullptr;
 
-    //size_t numOfBlocks = (size + MEM_BLOCK_SIZE - 1) / MEM_BLOCK_SIZE + 1;
-    //size_t numOfBlocksBytes = numOfBlocks * MEM_BLOCK_SIZE;
-
     size_t numOfBlocksBytes = size*MEM_BLOCK_SIZE + MEM_BLOCK_SIZE;
     size_t numOfBlocks = size + 1;
 
