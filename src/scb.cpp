@@ -15,13 +15,14 @@ int SCB::closeSemaphore(){
             Scheduler::put(thread);
         }
     }
+    cntBlck = 0;
     return 0;
 }
 
 int SCB::wait(){
     if(isClosed()) return -1;
 
-    if (value == 0) {
+    if (value <= 0) {
         TCB::running->setBlocked(true);
         blockedThreads.addLast(TCB::running);
         cntBlck++;
@@ -29,14 +30,14 @@ int SCB::wait(){
     } else {
         value--;
     }
-    return 0;
+    return isClosed() ? -1 : 0;
 }
 
 int SCB::signal(){
     if(isClosed()) return -1;
 
     if (cntBlck > 0) {
-        TCB* thread = blockedThreads.removeFirst();
+        TCB* thread = blockedThreads.removeLast();
         thread->setBlocked(false);
         Scheduler::put(thread);
         cntBlck--;
@@ -44,4 +45,15 @@ int SCB::signal(){
         value++;
     }
     return 0;
+}
+
+int SCB::tryWait(){
+    if(isClosed()) return -1;
+
+    if (value <= 0) {
+        return 1;
+    } else {
+        value--;
+        return 0;
+    }
 }

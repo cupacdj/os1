@@ -4,13 +4,14 @@
 
 #include "../h/MemoryAllocator.hpp"
 
-#include "../h/syscall_c.hpp"
+#include "../h/syscall_cpp.hpp"
 
 extern void userMain();
 
 void userThreadFn(void* arg)
 {
     userMain();
+    ((Semaphore*)arg)->signal();
 }
 int main()
 {
@@ -19,14 +20,17 @@ int main()
 
     TCB::running = TCB::createThread(nullptr, nullptr, nullptr);
 
-    thread_t userThread;
-    thread_create(&userThread, userThreadFn, nullptr);
+    Semaphore *sem = new Semaphore(0);
 
-    while (1)
-    {
-        thread_dispatch();
-    }
-   
+    // thread_t userThread;
+    // thread_create(&userThread, userThreadFn, sem);
+
+    Thread *userThread = new Thread(userThreadFn, sem);
+
+    userThread->start();
+
+    sem->wait();
+
 
     return 0;
 }

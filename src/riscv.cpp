@@ -33,8 +33,6 @@ void Riscv::handleSupervisorTrap()
         // interrupt: no; cause code: environment call from U-mode(8) or S-mode(9)
         sepc += 4;
 
-        // read the system call number from the a7 register from the trap frame
-        // then make a switch statement to handle the system calls
         size_t syscall_number = get_user_register(a0);
 
         switch (syscall_number)
@@ -59,7 +57,7 @@ void Riscv::handleSupervisorTrap()
             void (*start_routine)(void *) = (void (*)(void *))get_user_register(a2);
             void *arg = (void *)get_user_register(a3);
             char *stack = (char *)get_user_register(a4);
-            auto thread = TCB::createThread(start_routine, arg, stack);
+            TCB* thread = TCB::createThread(start_routine, arg, stack);
             if (thread) { 
                 Scheduler::put(thread); 
                 *handle = thread;
@@ -123,7 +121,13 @@ void Riscv::handleSupervisorTrap()
             break;
         }
 
-        
+        case SEM_TRYWAIT:
+        {
+            sem_t handle = (sem_t)get_user_register(a1);
+            int ret = handle->tryWait();
+            set_user_register(0, ret);
+            break;
+        }
 
         case GETC:
         {

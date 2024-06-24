@@ -2,17 +2,9 @@
 #include "../h/syscall_c.hpp"
 #include "../h/tcb.hpp"
 
-Thread::Thread(void (*body)(void *), void *arg) {
-    body = body;
-    arg = arg;
-    myHandle = nullptr;
-}
+Thread::Thread(void (*body)(void *), void *arg): myHandle(nullptr), body(body), arg(arg) {}
 
-Thread::Thread() {
-    body = runWrapper;
-    arg = this;
-    myHandle = nullptr;
-}
+Thread::Thread(): myHandle(nullptr), body(runWrapper), arg(this) {}
 
 void Thread::runWrapper(void *me) {
     ((Thread *) me)->run();

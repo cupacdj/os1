@@ -42,12 +42,14 @@ private:
         size_t sp;
     };
 
-    bool blocked;
+    
     Body body;
     void* arg;
     char *stack;
     Context context;
     bool finished;
+    bool blocked;
+    size_t id;
 
     friend class Riscv;
     friend class SCB;
@@ -57,6 +59,8 @@ private:
     static void contextSwitch(Context *oldContext, Context *runningContext);
 
     static void dispatch();
+
+    static bool operator<(const TCB& t1, const TCB& t2) { return t1.id < t2.id; }
 
 };
 

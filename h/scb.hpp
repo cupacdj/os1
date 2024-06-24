@@ -17,12 +17,14 @@ public:
 
     int closeSemaphore();
 
+    int tryWait();
+
 private:
     SCB(size_t init) : value(init), closed(false), cntBlck(0) {}
 
-    int cntBlck;
-    bool closed;
     size_t value;
+    bool closed;
+    int cntBlck;
     List<TCB> blockedThreads;
 
 };

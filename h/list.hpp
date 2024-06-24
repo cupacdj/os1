@@ -86,6 +86,25 @@ public:
         if (!tail) { return 0; }
         return tail->data;
     }
+
+    void sortedInsert(T* data){
+
+        Elem* newElem = new Elem(data, nullptr);
+
+        Elem* curr = head, *prev = nullptr;
+        while(curr && *curr->data < *data){
+            prev = curr;
+            curr = curr->next;
+        }
+
+        if(prev){
+            prev->next = newElem;
+        } else {
+            head = newElem;
+        }
+
+        newElem->next = curr;
+    }
 };
 
 #endif //OS1_LIST_HPP
