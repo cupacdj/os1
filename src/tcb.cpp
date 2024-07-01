@@ -1,6 +1,6 @@
 #include "../h/tcb.hpp"
 #include "../h/riscv.hpp"
-
+#include "../h/MemoryAllocator.hpp"
 #include "../h/syscall_c.hpp"
 
 TCB *TCB::running = nullptr;
@@ -14,7 +14,12 @@ TCB *TCB::createThread(Body body, void* arg, char* stack)
 void TCB::dispatch()
 {
     TCB *old = running;
-    if (!old->isFinished() && !old->isBlocked()) { Scheduler::put(old); }
+    if (!old->isFinished() && !old->isBlocked()) { 
+        Scheduler::put(old); 
+    }
+    else if(old->isFinished()) {
+        MemoryAllocator::mem_free(old->stack);
+    } 
     running = Scheduler::get();
 
     TCB::contextSwitch(&old->context, &running->context);

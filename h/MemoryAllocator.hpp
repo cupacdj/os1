@@ -3,7 +3,6 @@
 
 #include "../lib/hw.h"
 
-// this class needs to be Singleton 
 class MemoryAllocator {
 
 public:
