@@ -60,7 +60,7 @@ private:
 
     static void dispatch();
 
-    static bool operator<(const TCB& t1, const TCB& t2) { return t1.id < t2.id; }
+    friend bool operator<(const TCB& t1, const TCB& t2) { return t1.id < t2.id; }
 
 };
 

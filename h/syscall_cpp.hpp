@@ -57,7 +57,7 @@ public:
 protected:
     explicit PeriodicThread(time_t period): period(period) {};
 
-    virtual void periodicActivation() {}
+    virtual void periodicActivation() {};
 
     void run() override final {};
 

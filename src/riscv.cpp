@@ -101,7 +101,7 @@ void Riscv::handleSupervisorTrap()
         {
             sem_t handle = (sem_t)get_user_register(a1);
             int ret = handle->closeSemaphore();
-            set_user_register(0, ret);
+            set_user_register(a0, ret);
             break;
         }
 
@@ -109,7 +109,7 @@ void Riscv::handleSupervisorTrap()
         {
             sem_t handle = (sem_t)get_user_register(a1);
             int ret = handle->wait();
-            set_user_register(0, ret);
+            set_user_register(a0, ret);
             break;
         }
 
@@ -117,7 +117,7 @@ void Riscv::handleSupervisorTrap()
         {
             sem_t handle = (sem_t)get_user_register(a1);
             int ret = handle->signal();
-            set_user_register(0, ret);
+            set_user_register(a0, ret);
             break;
         }
 
@@ -125,7 +125,7 @@ void Riscv::handleSupervisorTrap()
         {
             sem_t handle = (sem_t)get_user_register(a1);
             int ret = handle->tryWait();
-            set_user_register(0, ret);
+            set_user_register(a0, ret);
             break;
         }
 
@@ -142,9 +142,7 @@ void Riscv::handleSupervisorTrap()
             break;
         }
 
-        
-
-        
+ 
         case TIME_SLEEP:
         case SEM_TIMEDWAIT:
         default:
