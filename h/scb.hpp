@@ -1,3 +1,6 @@
+#ifndef SCB_HPP
+#define SCB_HPP
+
 #include "../h/list.hpp"
 #include "../h/tcb.hpp"
 
@@ -28,3 +31,5 @@ private:
     List<TCB> blockedThreads;
 
 };
+
+#endif //SCB_HPP
