@@ -67,8 +67,6 @@ void Riscv::handleSupervisorTrap()
                 *handle = nullptr;
                 set_user_register(a0, -1);
             }
-            //dodato
-            *handle = thread;
             break;
         }   
         case THREAD_EXIT:
